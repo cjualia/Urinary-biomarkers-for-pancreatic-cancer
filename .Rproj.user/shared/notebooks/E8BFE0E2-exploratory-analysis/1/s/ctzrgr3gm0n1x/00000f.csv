@@ -1,0 +1,26 @@
+"0","summary(data)"
+"1","  sample_id         patient_cohort     sample_origin           age            sex           
+ Length:590         Length:590         Length:590         Min.   :26.00   Length:590        
+ Class :character   Class :character   Class :character   1st Qu.:50.00   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Median :60.00   Mode  :character  
+                                                          Mean   :59.08                     
+                                                          3rd Qu.:69.00                     
+                                                          Max.   :89.00                     
+                                                                                            
+   diagnosis        stage           benign_sample_diagnosis plasma_CA19_9       creatinine     
+ Min.   :1.000   Length:590         Length:590              Min.   :    0.0   Min.   :0.05655  
+ 1st Qu.:1.000   Class :character   Class :character        1st Qu.:    8.0   1st Qu.:0.37323  
+ Median :2.000   Mode  :character   Mode  :character        Median :   26.5   Median :0.72384  
+ Mean   :2.027                                              Mean   :  654.0   Mean   :0.85538  
+ 3rd Qu.:3.000                                              3rd Qu.:  294.0   3rd Qu.:1.13948  
+ Max.   :3.000                                              Max.   :31000.0   Max.   :4.11684  
+                                                            NA's   :240                        
+     LYVE1               REG1B                TFF1               REG1A         
+ Min.   : 0.000129   Min.   :   0.0011   Min.   :    0.005   Min.   :    0.00  
+ 1st Qu.: 0.167179   1st Qu.:  10.7572   1st Qu.:   43.961   1st Qu.:   80.69  
+ Median : 1.649862   Median :  34.3034   Median :  259.874   Median :  208.54  
+ Mean   : 3.063530   Mean   : 111.7741   Mean   :  597.869   Mean   :  735.28  
+ 3rd Qu.: 5.205037   3rd Qu.: 122.7410   3rd Qu.:  742.736   3rd Qu.:  649.00  
+ Max.   :23.890323   Max.   :1403.8976   Max.   :13344.300   Max.   :13200.00  
+                                                             NA's   :284       
+"

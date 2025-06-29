@@ -1,0 +1,87 @@
+---
+title: 'Exploratory analysis: Urinary biomarkers for pancreatic cancer'
+author: "Cristina Juárez Alía"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r include=FALSE}
+library(dplyr)
+```
+
+```{r include=FALSE}
+
+# Importing data from .csv (original dataset)
+data <- read.csv("C:/Users/cjuar/Desktop/Projects/Urinary-biomarkers-for-pancreatic-cancer/data/Debernardi et al 2020 data.csv", sep= ",", header = TRUE)
+```
+
+# Overview of initial dataset
+
+The dataset belongs to the study of Debernardi S. (2018) and can be downloaded from Kaggle (https://www.kaggle.com/datasets/johnjdavisiv/urinary-biomarkers-for-pancreatic-cancer).
+
+## Dimensions
+
+```{r dim}
+dim(data)
+```
+
+## Structure
+
+```{r dim}
+str(data)
+```
+
+The variables `patient_cohort`, `sample_origin`, `sex`, `diagnosis`, `stage`, `benign_sample_diagnosis` should be coerced to factors later (preprocessing).
+
+## Summary
+
+```{r summary}
+summary(data)
+```
+The NA's in `REG1A` and `plasma_CA19_9` correspond to unmeasured values. Only 350 and 306 patients were measured these parameters, respectively. This information is provided in the documentation provided by the authors. Therefore, since these NA's are established by design (authors's decision), we won't conduct a missing data analysis.
+
+# Preprocessing
+
+## Handling of insconsistencies 
+
+`benign_sample_diagnosis` is a character vector so it is likely that there are some typos. 
+
+```{r echo=FALSE}
+unique(data$benign_sample_diagnosis)
+```
+
+```{r typos}
+# Elimination of white spaces
+data$benign_sample_diagnosis <- trimws(data$benign_sample_diagnosis)
+
+# Correction of some typos
+# NOTE: These typos have been detected manually.
+data$benign_sample_diagnosis <- gsub("Pseuodcyst", "Pseudocyst", data$benign_sample_diagnosis)
+data$benign_sample_diagnosis <- gsub("Cholesterolsis", "Cholesterosis", data$benign_sample_diagnosis)
+data$benign_sample_diagnosis <- gsub("Choledocholiathiasis", "Choledocholithiasis", data$benign_sample_diagnosis)
+```
+
+
+## Coercion 
+
+```{r coercion}
+# Before coercing variable to factors we change some of the values for better rediability of the code
+
+data <- data %>% mutate(
+  
+  diagnosis = case_when(diagnosis == 1 ~ "control",
+                        diagnosis == 2 ~ "benign",
+                        diagnosis == 3 ~ "PDAC"),
+  
+  stage = case_when(stage == "" ~ NA_character_,
+                    TRUE ~ stage),
+  
+  benign_sample_diagnosis = case_when(benign_sample_diagnosis == "" ~ NA_character_,
+                                      TRUE ~ benign_sample_diagnosis),
+  
+  across(c(patient_cohort, sample_origin, sex, diagnosis, stage, benign_sample_diagnosis), as.factor))
+```
+
+# Bibliography 
+
+Debernardi S, O’Brien H, Algahmdi AS, Malats N, Stewart GD, et al. (2020) A combination of urinary biomarker panel and PancRISK score for earlier detection of pancreatic cancer: A case–control study. PLOS Medicine 17(12): e1003489. https://doi.org/10.1371/journal.pmed.1003489
