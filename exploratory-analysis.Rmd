@@ -7,10 +7,14 @@ output: pdf_document
 
 ```{r include=FALSE}
 library(dplyr)
+library(tidyverse)
+library(RColorBrewer)
+library(reshape2)
+install.packages("car")
+renv::snapshot()
 ```
 
 ```{r include=FALSE}
-
 # Importing data from .csv (original dataset)
 data <- read.csv("C:/Users/cjuar/Desktop/Projects/Urinary-biomarkers-for-pancreatic-cancer/data/Debernardi et al 2020 data.csv", sep= ",", header = TRUE)
 ```
@@ -38,7 +42,7 @@ The variables `patient_cohort`, `sample_origin`, `sex`, `diagnosis`, `stage`, `b
 ```{r summary}
 summary(data)
 ```
-The NA's in `REG1A` and `plasma_CA19_9` correspond to unmeasured values. Only 350 and 306 patients were measured these parameters, respectively. This information is provided in the documentation provided by the authors. Therefore, since these NA's are established by design (authors's decision), we won't conduct a missing data analysis.
+The NA's in `REG1A` and `plasma_CA19_9` correspond to unmeasured values. Only 350 and 306 patients, respectively, were measured these parameters. This information is provided in the documentation provided by the authors. Therefore, since these NA's are established by design (authors's decision), we won't conduct a missing data analysis.
 
 # Preprocessing
 
@@ -81,6 +85,72 @@ data <- data %>% mutate(
   
   across(c(patient_cohort, sample_origin, sex, diagnosis, stage, benign_sample_diagnosis), as.factor))
 ```
+
+---
+
+Finally, we save the preprocessed dataset, ready to work with:
+
+```{r saving}
+save(data, file="data/df.rda")
+```
+
+# Exploratory analysis
+
+## Contingency table: Sex vs Diagnostic Group
+
+```{r}
+sex_vs_diagnosis <- table(data$sex, data$diagnosis)
+```
+
+### Chi-squared test: Association between Sex and Diagnostic Group
+
+We can complement with a Chi-squared test, which evaluates if there is an association between sex vs diagnosis.
+
+```{r}
+chisq.test(sex_vs_diagnosis)
+```
+
+According to the test, there is an association between sex and diagnosis. 
+This should be accounted while interpreting the results.
+
+
+## Multivariate analysis
+
+### Violin Plots: Age by Diagnosis
+
+```{r}
+ggplot(data = data, aes(x = diagnosis, y = age, fill = diagnosis)) +
+  geom_violin(trim = FALSE) +
+  #coord_flip() # Flip the plot the other way around
+  #stat_summary(fun = mean, geom = "point", shape = 21, colour = "blue") + # mean
+  geom_boxplot(width = 0.1) +  # Adding boxplots
+  scale_fill_brewer(palette="Accent") +
+  labs(title = "Age by Diagnosis") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5)) 
+```
+
+
+#### Checking Normality and Variance of Age across Diagnostic groups
+
+##### Normality test: Shapiro-Wilk
+
+```{r}
+# Doing the test for each diagnosis group:
+by(data$age, data$diagnosis, shapiro.test)
+```
+There is sufficient evidence to reject the assumption of normality in the `benign` and `PDAC` groups based on the Shapiro-Wilk test (p < 0.05). *Therefore, we won't use ANOVA*
+
+##### Variance test: Levene's Test
+
+NOTE: We don't use Barlett's Test because groups `benign` and `PDAC` deviate from normality.
+
+```{r}
+
+leveneTest(age ~ diagnosis, data = data)
+```
+
+*Unfinished!*
 
 # Bibliography 
 
