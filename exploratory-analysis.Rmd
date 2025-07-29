@@ -170,10 +170,7 @@ According to the Kruskal-Wallis test, there are significant differences in the g
 
 **Why?**  
 
-Because we want to check for potential multicollinearity (which can affect linear regression models!).  
-Also, to explore relationships within the data, such as whether age is associated with higher or lower levels of certain biomarkers.
-
-We use numeric variables, including `age` and the biomarkers `creatinine`, `LYVE1`, `REG1B` and `TFF1`.
+To explore relationships within the data, such as whether age is associated with higher or lower levels of certain biomarkers.
 
 ```{r warning=FALSE, comment=FALSE, message=FALSE}
 ggpairs(data[,c(4,6,10:13)], 
@@ -186,11 +183,36 @@ ggpairs(data[,c(4,6,10:13)],
   theme_bw()
 ```
 
-There are not strong correlations among variables. The highest correlations are present in `REG1B` vs `TFF1`for `PDAC` group (0.651); and `LYVE1` vs `TFF1` in control group (0.649).
+There are not strong correlations among variables. The highest correlations are present in `REG1B` vs `TFF1`for `PDAC` group (0.651); and `LYVE1` vs `TFF1` in control group (0.649). 
 
-#### Visualization
+### Principal Component Analysis
 
-#### Correlation matrices 
+```{r message=FALSE, comment=FALSE}
+# PCA
+pca <- prcomp(data[,c(4,10:13)], scale = TRUE)
+coord <- pca$x # Coordinates matrix
+percent_var <- (pca$sdev)^2 / sum((pca$sdev)^2) * 100 # % explained variance for each PC
+
+# Data to plot
+pca_df <- data.frame(coord, 
+                     sample_id = data$sample_id, 
+                     sex = data$sex, 
+                     diagnosis = data$diagnosis)
+
+# PCA plot
+ggplot(pca_df) +
+  aes(PC1, PC2, color = diagnosis) + 
+  geom_point(size = 2, alpha = 0.8) +
+  scale_color_brewer(palette="Accent") +
+  geom_text(aes(label = sample_id), vjust = -0.5, size = 2) +
+  labs(x = paste0("PC1 (", round(percent_var[1], 1), "%)"),
+       y = paste0("PC2 (", round(percent_var[2], 1), "%)")) +
+  theme_bw()
+
+```
+
+
+### 
 
 # Bibliography 
 
